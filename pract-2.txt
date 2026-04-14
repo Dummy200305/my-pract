@@ -1,0 +1,33 @@
+#2
+
+import requests
+url = "https://jsonplaceholder.typicode.com/posts"
+
+response = requests.get(url)
+data = response.json()
+
+print(data[:2])
+
+
+
+import requests
+from bs4 import BeautifulSoup
+
+url = "https://quotes.toscrape.com/"
+response = requests.get(url)
+
+soup = BeautifulSoup(response.text, 'html.parser')
+
+# Extract only FIRST quote
+quote_tag = soup.find('span', class_='text')
+author_tag = soup.find('small', class_='author')
+# quotes = soup.find_all('span', class_='text')
+
+if quote_tag and author_tag:
+    quote = quote_tag.text
+    author = author_tag.text
+    print("Quote:", quote)
+    print("Author:", author)
+
+    # print(quotes[0].text)
+    # print(quotes[1].text)
