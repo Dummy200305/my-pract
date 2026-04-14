@@ -1,0 +1,42 @@
+#3
+
+import pandas as pd
+
+# Create sample data
+data = pd.DataFrame({
+    'Name': ['John', None, 'Mike', 'Sarah'],
+    'Age': [25, None, 30, 40],
+    'City': ['Mumbai', None, 'Delhi', 'Chennai'],
+    'Revenue': [100, None, -50, 200]
+})
+print("Original Data:")
+print(data)
+
+
+# 1. Handle missing values
+data['Age'] = data['Age'].fillna(data['Age'].mean())
+data['City'] = data['City'].fillna('Unknown')
+
+print("After Handling Missing Values:")
+print(data)
+
+
+# 2. Remove invalid data (negative revenue)
+data = data[data['Revenue'] >= 0]
+
+print("After Removing Invalid Data (Negative Revenue):")
+print(data)
+
+
+# 3. Remove duplicates
+data = data.drop_duplicates()
+
+print("After Removing Duplicates:")
+print(data)
+
+
+# 4. Clean text (names)
+data['Name'] = data['Name'].str.strip().str.title()
+
+print("Final Cleaned Data:")
+print(data)
