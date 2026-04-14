@@ -1,0 +1,43 @@
+#6
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+!unzip "/content/archive (1).zip"
+
+data=pd.read_csv("/content/Titanic-Dataset.csv")
+
+data.head()
+
+data.info()
+
+data.describe()
+
+data.isnull().sum()
+
+data=data.drop(['PassengerId','Name','Ticket','Fare','Cabin',],axis=1)
+
+data.describe()
+
+
+data.isnull().sum()
+
+data['Age']=data['Age'].fillna(data['Age'].mean())
+
+sns.catplot(x='Sex',hue='Survived',kind='count',data=data)
+
+print(data['Sex'].value_counts())
+
+data.groupby(['Sex','Survived'])['Survived'].count()
+
+group1=data.groupby(['Sex','Survived'])
+gender_survived=group1.size().unstack()
+sns.heatmap(gender_survived,annot=True, fmt='d')
+
+group2=data.groupby(['Pclass','Survived'])
+gender_survived=group2.size().unstack()
+sns.heatmap(gender_survived,annot=True, fmt='d')
+
+sns.violinplot(x='Sex',y='Age',hue='Survived',data=data,split=True)
