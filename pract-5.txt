@@ -1,0 +1,41 @@
+#5
+
+import pandas as pd
+
+# Load dataset
+df = pd.read_csv('/content/StatewiseTestingDetails.csv')
+
+print("Original Data:")
+print(df.info())
+print(df.head())
+
+# 1. Handle missing values
+
+df["Negative"].fillna(0, inplace=True)
+df["Positive"].fillna(0, inplace=True)
+
+print("After Handling Missing Values:")
+print(df.head())
+
+# 2. String manipulation
+df["State"] = df["State"].str.strip()
+df["State"] = df["State"].str.title()
+
+print("After String Cleaning:")
+print(df.head())
+
+# 3. Convert date format
+df["Date"] = pd.to_datetime(df["Date"], dayfirst=True)
+
+print("After Date Conversion:")
+print(df.head())
+
+# Final Output
+print("Cleaned Data Info:")
+print(df.info())
+
+# Save cleaned data
+df.to_csv("cleaned_statewise_testing.csv", index=False)
+
+print("Data Cleaning Completed!")
+
