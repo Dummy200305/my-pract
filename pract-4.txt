@@ -1,0 +1,48 @@
+#4
+import pandas as pd
+
+# Create sample data
+data = pd.DataFrame({
+    'Name': ['John', 'Mike', 'Sarah', 'John'],
+    'Department': ['IT', 'HR', 'IT', 'HR'],
+    'Salary': [50000, 60000, 55000, 52000],
+    'Age': [25, 30, 28, 26]
+})
+
+print("Original Data:")
+print(data)
+
+
+# 1. Filter data (Salary > 52000)
+filtered_data = data[data['Salary'] > 52000]
+
+print("Filtered Data (Salary > 52000):")
+print(filtered_data)
+
+
+# 2. Group data (Average Salary by Department)
+grouped_data = data.groupby('Department')['Salary'].mean()
+
+print("Average Salary by Department:")
+print(grouped_data)
+
+
+# 3. Sort data by Salary
+sorted_data = data.sort_values(by='Salary', ascending=False)
+
+print("Sorted Data (High to Low Salary):")
+print(sorted_data)
+
+
+# 4. Add new column
+data['Bonus'] = data['Salary'] * 0.1
+
+print("After Adding Bonus Column:")
+print(data)
+
+
+# 5. Rename column
+data.rename(columns={'Name': 'Employee_Name'}, inplace=True)
+
+print("After Renaming Column:")
+print(data)
