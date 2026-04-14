@@ -1,0 +1,22 @@
+#1
+import pandas as pd
+
+#Load dataset
+df = pd.read_csv('/content/netflix_titles (1).csv')
+df_txt = pd.read_csv('/content/sample_dav.txt')
+df_json = pd.read_json('/content/sample_dav.json')
+
+# Display Dataset
+df_txt.head()
+print(df_txt)
+
+df_json.head()
+print(df_json)
+
+# Store data in Text File
+df_json.to_csv('json_output.txt', index=False)
+
+# Read Text File
+data = pd.read_csv('json_output.txt')
+print(data.head())
+(This is practical 1 content for colab)
