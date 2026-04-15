@@ -1,43 +1,35 @@
-#6
+#6 implement Sort Functions
 
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import col
 
-!unzip "/content/archive (1).zip"
+spark = SparkSession.builder.appName("SortFunctionsDemo").getOrCreate()
 
-data=pd.read_csv("/content/Titanic-Dataset.csv")
+data = [
+    (1, "Alice", 25, 3000),
+    (2, "Bob", 30, 4000),
+    (3, "Cathy", 28, 4500),
+    (4, "David", 35, 5000),
+    (5, "Eve", 30, 3500)
+]
 
-data.head()
+columns = ["id", "name", "age", "salary"]
 
-data.info()
+df = spark.createDataFrame(data, columns)
 
-data.describe()
+df.show()
 
-data.isnull().sum()
+df.orderBy(col("age")).show()
 
-data=data.drop(['PassengerId','Name','Ticket','Fare','Cabin',],axis=1)
+from pyspark.sql.functions import desc
+df.orderBy(desc("salary")).show()
 
-data.describe()
+df.sort(col("age"), col("salary").desc()).show()
 
+from pyspark.sql.window import Window
+from pyspark.sql.functions import rank
 
-data.isnull().sum()
+window_spec = Window.partitionBy().orderBy(col("salary").desc())
+df.withColumn("rank", rank().over(window_spec)).show()
 
-data['Age']=data['Age'].fillna(data['Age'].mean())
-
-sns.catplot(x='Sex',hue='Survived',kind='count',data=data)
-
-print(data['Sex'].value_counts())
-
-data.groupby(['Sex','Survived'])['Survived'].count()
-
-group1=data.groupby(['Sex','Survived'])
-gender_survived=group1.size().unstack()
-sns.heatmap(gender_survived,annot=True, fmt='d')
-
-group2=data.groupby(['Pclass','Survived'])
-gender_survived=group2.size().unstack()
-sns.heatmap(gender_survived,annot=True, fmt='d')
-
-sns.violinplot(x='Sex',y='Age',hue='Survived',data=data,split=True)
+spark.stop()
