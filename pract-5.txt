@@ -1,41 +1,49 @@
-#5
+#5 implement Date and Timestamp Functions
 
-import pandas as pd
 
-# Load dataset
-df = pd.read_csv('/content/StatewiseTestingDetails.csv')
 
-print("Original Data:")
-print(df.info())
-print(df.head())
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import col, current_date, current_timestamp
+from pyspark.sql.functions import date_add, date_sub, datediff, months_between
+from pyspark.sql.functions import year, month, dayofmonth, hour, minute, second, to_date, to_timestamp, date_format
 
-# 1. Handle missing values
+spark = SparkSession.builder.appName("DateTimestampFunctionsDemo").getOrCreate()
 
-df["Negative"].fillna(0, inplace=True)
-df["Positive"].fillna(0, inplace=True)
+data = [
+    ("2026-02-10", "2026-02-10 14:30:15"),
+    ("2026-01-25", "2026-01-25 09:15:00"),
+    ("2025-12-31", "2025-12-31 23:59:59")
+]
 
-print("After Handling Missing Values:")
-print(df.head())
+columns = ["date_str", "timestamp_str"]
 
-# 2. String manipulation
-df["State"] = df["State"].str.strip()
-df["State"] = df["State"].str.title()
+df = spark.createDataFrame(data, columns)
 
-print("After String Cleaning:")
-print(df.head())
+df = df.withColumn("date_col", to_date(col("date_str"))) \
+       .withColumn("timestamp_col", to_timestamp(col("timestamp_str")))
 
-# 3. Convert date format
-df["Date"] = pd.to_datetime(df["Date"], dayfirst=True)
+df.show(truncate=False)
 
-print("After Date Conversion:")
-print(df.head())
+df.select(current_date().alias("current_date")).show()
 
-# Final Output
-print("Cleaned Data Info:")
-print(df.info())
+df.withColumn("date_plus_5", date_add(col("date_col"), 5)).show()
 
-# Save cleaned data
-df.to_csv("cleaned_statewise_testing.csv", index=False)
+df.withColumn("date_minus_10", date_sub(col("date_col"), 10)).show()
 
-print("Data Cleaning Completed!")
+df.withColumn("days_diff", datediff(current_date(), col("date_col"))).show()
 
+df.withColumn("months_diff", months_between(current_date(), col("date_col"))).show()
+
+df.withColumn("year_val", year(col("date_col"))) \
+  .withColumn("month_val", month(col("date_col"))) \
+  .withColumn("day_val", dayofmonth(col("date_col"))).show()
+
+df.select(current_timestamp().alias("current_timestamp")).show(truncate=False)
+
+df.withColumn("hour_val", hour(col("timestamp_col"))) \
+  .withColumn("minute_val", minute(col("timestamp_col"))) \
+  .withColumn("second_val", second(col("timestamp_col"))).show()
+
+df.withColumn("formatted_date", date_format(col("timestamp_col"), "dd-MMM-yyyy HH:mm:ss")).show(truncate=False)
+
+spark.stop()
