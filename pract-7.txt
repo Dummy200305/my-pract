@@ -1,0 +1,40 @@
+#7 Aggregate Functions
+
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import sum, avg, count, min, max
+
+spark = SparkSession.builder \
+    .appName("AggregateFunctionsExample") \
+    .getOrCreate()
+
+data = [
+    (1, "Alice", "Sales", 5000),
+    (2, "Bob", "Sales", 6000),
+    (3, "Charlie", "HR", 4000),
+    (4, "David", "HR", 4500),
+    (5, "Eve", "IT", 7000)
+]
+
+columns = ["id", "name", "department", "salary"]
+df = spark.createDataFrame(data, columns)
+
+print("Original Data:")
+df.show()
+
+print("Global Aggregates:")
+df.select(
+    sum("salary").alias("Total Salary"),
+    avg("salary").alias("Average Salary"),
+    min("salary").alias("Minimum Salary"),
+    max("salary").alias("Maximum Salary"),
+    count("salary").alias("Employee Count")
+).show()
+
+print("Department-wise Aggregates:")
+df.groupBy("department").agg(
+    sum("salary").alias("Total Salary"),
+    avg("salary").alias("Average Salary"),
+    count("id").alias("Employee Count")
+).show()
+
+spark.stop()
