@@ -1,33 +1,55 @@
-#2
+#2 Perform union, intersection, join, words count
 
-import requests
-url = "https://jsonplaceholder.typicode.com/posts"
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import col, explode, split
 
-response = requests.get(url)
-data = response.json()
+spark = SparkSession.builder \
+    .appName("PySpark Operations Demo") \
+    .getOrCreate()
 
-print(data[:2])
+data1 = [(1, "Alice"), (2, "Bob"), (3, "Charlie")]
+data2 = [(3, "Charlie"), (4, "David"), (5, "Eve")]
 
+df1 = spark.createDataFrame(data1, ["id", "name"])
+df2 = spark.createDataFrame(data2, ["id", "name"])
 
+print("DataFrame 1:")
+df1.show()
 
-import requests
-from bs4 import BeautifulSoup
+print("DataFrame 2:")
+df2.show()
 
-url = "https://quotes.toscrape.com/"
-response = requests.get(url)
+print("Union Result:")
+union_df = df1.union(df2)
+union_df.show()
 
-soup = BeautifulSoup(response.text, 'html.parser')
+print("Intersection Result:")
+intersection_df = df1.intersect(df2)
+intersection_df.show()
 
-# Extract only FIRST quote
-quote_tag = soup.find('span', class_='text')
-author_tag = soup.find('small', class_='author')
-# quotes = soup.find_all('span', class_='text')
+dept_data = [(1, "HR"), (2, "IT"), (3, "Finance"), (6, "Marketing")]
+dept_df = spark.createDataFrame(dept_data, ["id", "department"])
 
-if quote_tag and author_tag:
-    quote = quote_tag.text
-    author = author_tag.text
-    print("Quote:", quote)
-    print("Author:", author)
+print("Department DataFrame:")
+dept_df.show()
 
-    # print(quotes[0].text)
-    # print(quotes[1].text)
+print("Inner Join Result:")
+join_df = df1.join(dept_df, on="id", how="inner")
+join_df.show()
+
+text_data = [("Spark is fast and Spark is powerful",),
+             ("PySpark makes big data processing easy",)]
+
+text_df = spark.createDataFrame(text_data, ["sentence"])
+
+print("Word Count Result:")
+words_df = text_df.select(
+    explode(
+        split(col("sentence"), " ")
+    ).alias("word")
+)
+
+word_count = words_df.groupBy("word").count()
+word_count.show()
+
+spark.stop()
