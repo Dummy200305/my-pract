@@ -1,22 +1,21 @@
-#1
-import pandas as pd
+#1 RDD operations first 4 lines of the text file
+from pyspark.sql import SparkSession
 
-#Load dataset
-df = pd.read_csv('/content/netflix_titles (1).csv')
-df_txt = pd.read_csv('/content/sample_dav.txt')
-df_json = pd.read_json('/content/sample_dav.json')
+spark = SparkSession.builder \
+    .appName("RDD Example - Show First 4 Lines") \
+    .getOrCreate()
 
-# Display Dataset
-df_txt.head()
-print(df_txt)
+sc = spark.sparkContext
 
-df_json.head()
-print(df_json)
+rdd = sc.textFile("example.txt")
 
-# Store data in Text File
-df_json.to_csv('json_output.txt', index=False)
+first_four_lines = rdd.take(4)
 
-# Read Text File
-data = pd.read_csv('json_output.txt')
-print(data.head())
+print("First 4 lines of the file:")
+for line in first_four_lines:
+    print(line)
+
+spark.stop()
+ 
+
 (This is practical 1 content for colab)
