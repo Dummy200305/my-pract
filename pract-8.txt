@@ -1,0 +1,37 @@
+#8  implement Window Functions, JSON Functions
+
+from pyspark.sql import SparkSession
+from pyspark.sql.window import Window
+from pyspark.sql.functions import row_number, rank, dense_rank, lag, lead, sum
+
+spark = SparkSession.builder \
+    .appName("WindowFunctionsExample") \
+    .getOrCreate()
+
+data = [
+    (1, "Alice", "Sales", 5000),
+    (2, "Bob", "Sales", 6000),
+    (3, "Charlie", "Sales", 5500),
+    (4, "David", "HR", 4000),
+    (5, "Eve", "HR", 4500)
+]
+
+columns = ["id", "name", "department", "salary"]
+df = spark.createDataFrame(data, columns)
+
+print("Original Data:")
+df.show()
+
+windowSpec = Window.partitionBy("department").orderBy("salary")
+
+df_window = df.withColumn("Row_Number", row_number().over(windowSpec)) \
+    .withColumn("Rank", rank().over(windowSpec)) \
+    .withColumn("Dense_Rank", dense_rank().over(windowSpec)) \
+    .withColumn("Previous_Salary", lag("salary", 1).over(windowSpec)) \
+    .withColumn("Next_Salary", lead("salary", 1).over(windowSpec)) \
+    .withColumn("Running_Total", sum("salary").over(windowSpec))
+
+print("Window Function Result:")
+df_window.show()
+
+spark.stop() 
